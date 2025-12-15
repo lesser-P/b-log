@@ -1,4 +1,4 @@
-module b-log
+module github.com/lesser-P/b-log
 
 go 1.24
 
