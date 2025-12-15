@@ -1,4 +1,4 @@
-module b_log
+module b-log
 
 go 1.24
 
