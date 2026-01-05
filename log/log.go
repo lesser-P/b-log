@@ -13,7 +13,7 @@ type BergLog struct {
 	log zerolog.Logger
 }
 
-var blog *BergLog
+var Blog *BergLog
 
 func InitBergLog(logPath string, level zerolog.Level) {
 	var logger zerolog.Logger
@@ -24,7 +24,7 @@ func InitBergLog(logPath string, level zerolog.Level) {
 			TimeLocation: time.Local,
 			PartsOrder:   []string{"time", "level", "message"},
 		}
-		logger = zerolog.New(cw).With().Timestamp().Logger()
+		logger = zerolog.New(cw).With().Caller().Timestamp().Logger()
 	} else {
 		dir := filepath.Dir(logPath)
 		if _, err := os.Stat(dir); os.IsNotExist(err) {
@@ -40,28 +40,34 @@ func InitBergLog(logPath string, level zerolog.Level) {
 		logger = zerolog.New(file).With().Timestamp().Logger()
 	}
 	logger.Level(level)
-	blog = &BergLog{
+	Blog = &BergLog{
 		logger,
 	}
+}
+func Interface(ctx context.Context, level zerolog.Level, data any, msg string, args ...any) {
+	var traceId string
+	traceId = ctx.Value("traceId").(string)
+	Blog.log.WithLevel(level).Str("traceId", traceId).Interface("data", data).Msgf(msg, args)
+
 }
 func Info(ctx context.Context, msg string) {
 	var traceId string
 	traceId = ctx.Value("traceId").(string)
-	blog.log.Info().Str("traceId", traceId).Msg(msg)
+	Blog.log.Info().Str("traceId", traceId).Msg(msg)
 }
 func Warn(ctx context.Context, msg string) {
 	var traceId string
 	traceId = ctx.Value("traceId").(string)
-	blog.log.Warn().Str("traceId", traceId).Msg(msg)
+	Blog.log.Warn().Str("traceId", traceId).Msg(msg)
 }
 func Error(ctx context.Context, err error) {
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 	var traceId string
 	traceId = ctx.Value("traceId").(string)
-	blog.log.Error().Stack().Err(err).Str("traceId", traceId).Msg(err.Error())
+	Blog.log.Error().Stack().Err(err).Str("traceId", traceId).Msg(err.Error())
 }
 func Debug(ctx context.Context, msg string) {
 	var traceId string
 	traceId = ctx.Value("traceId").(string)
-	blog.log.Debug().Str("traceId", traceId).Msg(msg)
+	Blog.log.Debug().Str("traceId", traceId).Msg(msg)
 }

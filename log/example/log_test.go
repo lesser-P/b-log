@@ -2,23 +2,20 @@ package example
 
 import (
 	"context"
-	"github.com/lesser-P/berg-tools/log"
-	"github.com/pkg/errors"
+	"github.com/lesser-P/b-log/log"
 	"github.com/rs/zerolog"
 	"testing"
 )
 
 func TestExampleBergLog(t *testing.T) {
+	ctx := context.WithValue(context.Background(), "traceId", "test")
 	log.InitBergLog("stdout", zerolog.InfoLevel)
-	ctx := context.Background()
-	ctx = context.WithValue(ctx, "traceId", "0x000000000000berg")
-	log.Info(ctx, "Test")
-	log.Debug(ctx, "Test")
-	log.Warn(ctx, "Test")
-	log.Error(ctx, errors.New("Test"))
-	log.InitBergLog("test.log", zerolog.InfoLevel)
-	log.Info(ctx, "Test")
-	log.Debug(ctx, "Test")
-	log.Warn(ctx, "Test")
-	log.Error(ctx, errors.New("Test"))
+	data := struct {
+		UserName string `json:"user_name"`
+		Password string `json:"password"`
+	}{
+		UserName: "berg",
+		Password: "aaxks",
+	}
+	log.Interface(ctx, zerolog.ErrorLevel, data, "this is %s a test log ", "haha")
 }
